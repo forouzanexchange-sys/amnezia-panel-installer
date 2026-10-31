@@ -35,7 +35,6 @@
 ### 🔐 امنیت پیشرفته
 - **SSL خودکار** با Let's Encrypt
 - Bind داخلی پنل روی `127.0.0.1:5000`
-- پسورد سفارشی یا خودکار (۴۸ کاراکتر hex)
 - `SECRET_KEY` ثابت برای حفظ نشست‌ها بعد از ری‌استارت
 - `credentials.txt` با دسترسی `0600`
 
@@ -46,7 +45,7 @@
 
 ### 🎯 سادگی استفاده
 - نصب با **یک دستور**
-- انتخاب پسورد در هنگام نصب
+- فقط یک سؤال: دامنه
 - دریافت اطلاعات ورود در پایان نصب
 - بررسی خودکار DNS قبل از نصب
 
@@ -73,25 +72,25 @@
 curl -fsSL https://raw.githubusercontent.com/forouzanexchange-sys/amnezia-panel-installer/main/install.sh -o install.sh && bash -n install.sh && sudo bash install.sh
 ```
 
-### 📝 در هنگام نصب، اسکریپت اینا رو می‌پرسه:
+### 📝 در هنگام نصب، اسکریپت فقط یک سؤال می‌پرسه:
 
 | # | سؤال | توضیح |
 |---|------|-------|
 | ۱ | 🌐 **دامنه** | مثل `panel.yourdomain.com` |
-| ۲ | 🔑 **پسورد سفارشی** | خالی بذاری، خودکار تولید می‌شه (۴۸ کاراکتر) |
 
 **نمونه‌ی اجرا:**
 
 ```
 Enter your domain (e.g. panel.example.com): panel.qforo.xyz
 
-Admin password (min 8 chars, leave empty to auto-generate): ●●●●●●●●
-
+[INFO] DNS: panel.qforo.xyz -> 203.0.113.5
+[INFO] Pulled prebuilt image from ghcr.io
 [INFO] Panel is up after 12s.
-[INFO] Password updated successfully via /api/users/change-password
+[INFO] UFW enabled. Open ports: 22, 80, 443
+[INFO] Installation complete!
 ```
 
-اگه پسورد را خالی بذاری، اسکریپت خودش یه پسورد قوی ۴۸ کاراکتری hex تولید می‌کنه.
+پسورد پیش‌فرض ادمین **`admin`** است. بعد از اولین ورود، از بخش **Users** آن را تغییر دهید.
 
 ---
 
@@ -126,9 +125,14 @@ TTL: خودکار
 
 ## 🚪 ورود به پنل
 
-در پایان نصب، **آدرس پنل** و **رمز ورود** نمایش داده می‌شن.
+در پایان نصب، **آدرس پنل** نمایش داده می‌شه.
 
-> 💡 **نام کاربری پیش‌فرض:** `admin`
+| فیلد | مقدار |
+|---|---|
+| **Username** | `admin` |
+| **Password** | `admin` |
+
+> ⚠️ **مهم:** بعد از اولین ورود، فوراً از بخش **Users** پسورد را تغییر دهید.
 
 برای مشاهده اطلاعات ورود ذخیره‌شده هنگام نصب:
 
@@ -142,34 +146,15 @@ sudo cat /opt/amnezia-panel/credentials.txt
 
 ## 🔑 تغییر پسورد ادمین
 
-> ⚠️ **صادقانه:** پنل Amnezia Web Panel برخلاف OutlineAdmin یک دستور CLI رسمی مثل `npm run password:change` ندارد. اسکریپت نصب تلاش می‌کند پسورد را از طریق چند endpoint رایج API عوض کند. اگر نسخه‌ای از پنل این endpoint را نداشته باشد، پسورد **همان `admin/admin`** باقی می‌ماند و در پایان نصب هشدار داده می‌شود.
+پنل Amnezia Web Panel دستور CLI رسمی برای تغییر پسورد ندارد. **تغییر از داخل خود پنل انجام می‌شود:**
 
-### حالت اول — تغییر خودکار در هنگام نصب
+1. با `admin / admin` وارد شوید
+2. به بخش **Users** بروید
+3. روی کاربر `admin` کلیک کنید
+4. گزینه **Change password** را بزنید
+5. پسورد جدید را وارد و ذخیره کنید
 
-اگر در پرامپت نصب، پسورد سفارشی وارد کنی (یا خالی بگذاری تا خودکار تولید بشه)، اسکریپت تلاش می‌کند آن را از طریق API تنظیم کند. اگر موفق شود:
-
-```
-[INFO] Password updated successfully via /api/users/change-password
-```
-
-در این صورت، همان پسورد در `credentials.txt` ذخیره می‌شود.
-
-### حالت دوم — تغییر دستی از داخل پنل (توصیه‌شده)
-
-اگر اسکریپت هشدار زیر را داد:
-
-```
-[WARN] Automatic password change is not supported by this panel version.
-[WARN] Default login: admin / admin - change it immediately in the Users section.
-```
-
-یعنی باید بعد از اولین ورود با `admin / admin`، از بخش **Users** در خود پنل پسورد را عوض کنید.
-
-### ⚠️ نکات امنیتی
-
-- ✅ پسورد پس از نصب در `credentials.txt` با `chmod 0600` محافظت می‌شه
-- ⚠️ در حالت خودکار، ممکن است پسورد در لاگ اسکریپت دیده شود؛ خروجی یا تصویر آن را منتشر نکنید
-- ℹ️ فایل `credentials.txt` فقط در زمان نصب نوشته می‌شه و اگر بعداً از داخل پنل پسورد را عوض کنید، خودکار به‌روز نمی‌شود
+> ℹ️ فایل `credentials.txt` به‌طور خودکار با تغییر پسورد از داخل پنل به‌روز نمی‌شود. اگر پسورد را عوض کردید، این فایل را دستی به‌روز کنید یا حذف کنید.
 
 ---
 
@@ -180,10 +165,9 @@ sudo cat /opt/amnezia-panel/credentials.txt
 - ✅ **UFW Firewall**: فقط پورت‌های 22 (یا پورت SSH شما)، 80، 443 باز می‌شن
 - ✅ **SSL خودکار**: Caddy گواهی Let's Encrypt را خودکار مدیریت می‌کند
 - ✅ **Bind داخلی**: پنل فقط از `127.0.0.1:5000` در دسترسه (از بیرون فقط از طریق HTTPS در Caddy)
-- ✅ **پسورد قوی**: ۴۸ کاراکتر hex به صورت تصادفی (یا سفارشی)
 - ✅ **`SECRET_KEY` ثابت**: با `openssl rand -hex 32` تولید می‌شه تا نشست‌ها با ری‌استارت از دست نرن
 - ✅ **فایل credentials**: با `chmod 0600` محافظت می‌شه
-- ✅ **بررسی DNS**: قبل از شروع نصب، تطابق دامنه با IP سرور چک می‌شه
+- ✅ **بررسی DNS**: قبل از شروع نصب، تطابق دامنه با IP سرور چک می‌شه (اطلاعاتی، نصب را متوقف نمی‌کند)
 
 ---
 
@@ -244,11 +228,12 @@ sudo tar czf /root/amnezia-backup-$(date +%F).tar.gz -C /opt/amnezia-panel data
 ## 🔧 پس از نصب
 
 1. پنل را در مرورگر باز کن: `https://panel.yourdomain.com`
-2. با `admin` و رمزی که در `credentials.txt` ذخیره شده (یا رمز خودکار) وارد شو
-3. در بخش **Servers** روی دکمه **Add Server** بزن
-4. اطلاعات SSH سرور Amnezia خود را وارد کن (IP، یوزرنیم، پسورد یا کلید خصوصی)
-5. صبر کن تا تأیید خودکار سرور انجام بشه — پنل پروتکل‌های نصب‌شده و کاربران موجود را تشخیص می‌ده
-6. از همان پنل می‌تونی پروتکل نصب کنی، کاربر اضافه کنی، و اتصال‌ها را مدیریت کنی
+2. با `admin / admin` وارد شو
+3. **فوراً از بخش Users پسورد را عوض کن**
+4. در بخش **Servers** روی دکمه **Add Server** بزن
+5. اطلاعات SSH سرور Amnezia خود را وارد کن (IP، یوزرنیم، پسورد یا کلید خصوصی)
+6. صبر کن تا تأیید خودکار سرور انجام بشه — پنل پروتکل‌های نصب‌شده و کاربران موجود را تشخیص می‌ده
+7. از همان پنل می‌تونی پروتکل نصب کنی، کاربر اضافه کنی، و اتصال‌ها را مدیریت کنی
 
 ---
 
@@ -297,17 +282,6 @@ sudo tar czf /root/amnezia-backup-$(date +%F).tar.gz -C /opt/amnezia-panel data
   ```bash
   sudo journalctl -u caddy -n 100 | grep -i "acme\|certificate"
   ```
-
-</details>
-
-<details>
-<summary><b>🔵 پسورد خودکار تنظیم نشد</b></summary>
-
-اگر در خروجی نصب این را دیدی:
-```
-[WARN] Automatic password change is not supported by this panel version.
-```
-یعنی نسخه پنل endpoint تغییر پسورد از طریق API را ندارد. با `admin/admin` وارد شو و از بخش **Users** در خود پنل پسورد را عوض کن.
 
 </details>
 
